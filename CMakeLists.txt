@@ -1,3 +1,17 @@
+# == DO NOT EDIT THE FOLLOWING LINES for the Raspberry Pi Pico VS Code Extension to work ==
+if(WIN32)
+    set(USERHOME $ENV{USERPROFILE})
+else()
+    set(USERHOME $ENV{HOME})
+endif()
+set(sdkVersion 2.1.1)
+set(toolchainVersion 14_2_Rel1)
+set(picotoolVersion 2.1.1)
+set(picoVscode ${USERHOME}/.pico-sdk/cmake/pico-vscode.cmake)
+if (EXISTS ${picoVscode})
+    include(${picoVscode})
+endif()
+# ====================================================================================
 
 # Generated Cmake Pico project file
 
@@ -35,14 +49,15 @@ pico_enable_stdio_usb(led_control_webserver 1)
 
 # Add the standard library to the build
 target_link_libraries(led_control_webserver
-        pico_stdlib
-        hardware_gpio
-        hardware_adc
-        pico_cyw43_arch_lwip_threadsafe_background
-        FreeRTOS-Kernel 
-        FreeRTOS-Kernel-Heap4
-        hardware_i2c
-        hardware_pwm
+    pico_stdlib
+    hardware_gpio
+    hardware_adc
+    pico_lwip_mqtt
+    pico_cyw43_arch_lwip_threadsafe_background 
+    FreeRTOS-Kernel
+    FreeRTOS-Kernel-Heap4 
+    hardware_i2c 
+    hardware_pwm
 )
 
 # Add the standard include files to the build
@@ -51,7 +66,6 @@ target_include_directories(led_control_webserver PRIVATE
     ${PICO_SDK_PATH}/lib/lwip/src/include
     ${PICO_SDK_PATH}/lib/lwip/src/include/arch
     ${PICO_SDK_PATH}/lib/lwip/src/include/lwip
-    lib/ds18b20/ds18b20.h
 )
 
 target_sources(led_control_webserver PRIVATE

@@ -1,32 +1,33 @@
-#ifndef LWIPOPTS_H
-#define LWIPOPTS_H
+#ifndef _LWIPOPTS_H
+#define _LWIPOPTS_H
 
-// Configuração mínima para lwIP
-#define NO_SYS 1
-#define LWIP_SOCKET 0
-#define LWIP_NETCONN 0
-#define LWIP_TCP 1
-#define LWIP_UDP 1
-#define MEM_ALIGNMENT 4
-#define MEM_SIZE 4096
-#define MEMP_NUM_PBUF 16
-#define PBUF_POOL_SIZE 16               // Ajuste conforme necessário
-#define MEMP_NUM_UDP_PCB 4
-#define MEMP_NUM_TCP_PCB 4
-#define MEMP_NUM_TCP_SEG 16
-#define LWIP_IPV4 1
-#define LWIP_ICMP 1
-#define LWIP_RAW 1
-#define LWIP_DHCP 1
-#define LWIP_AUTOIP 1
-#define LWIP_DNS 1
-#define LWIP_HTTPD 1
-#define LWIP_HTTPD_SSI              1  // Habilita SSI
-#define LWIP_HTTPD_SUPPORT_POST     1  // Habilita suporte a POST, se necessário
-#define LWIP_HTTPD_DYNAMIC_HEADERS 1
-#define HTTPD_USE_CUSTOM_FSDATA 0
-#define LWIP_HTTPD_CGI 0           // Desative CGI para economizar memória
-#define LWIP_NETIF_HOSTNAME 1
+// Need more memory for TLS
+#ifdef MQTT_CERT_INC
+#define MEM_SIZE 8000
+#endif
 
+// Generally you would define your own explicit list of lwIP options
+// (see https://www.nongnu.org/lwip/2_1_x/group__lwip__opts.html)
+//
+// This example uses a common include to avoid repetition
+#include "lwipopts_examples_common.h"
 
-#endif /* LWIPOPTS_H */
+#define MEMP_NUM_SYS_TIMEOUT        (LWIP_NUM_SYS_TIMEOUT_INTERNAL+1)
+
+#ifdef MQTT_CERT_INC
+#define LWIP_ALTCP               1
+#define LWIP_ALTCP_TLS           1
+#define LWIP_ALTCP_TLS_MBEDTLS   1
+#ifndef NDEBUG
+#define ALTCP_MBEDTLS_DEBUG  LWIP_DBG_ON
+#endif
+/* TCP WND must be at least 16 kb to match TLS record size
+   or you will get a warning "altcp_tls: TCP_WND is smaller than the RX decrypion buffer, connection RX might stall!" */
+#undef TCP_WND
+#define TCP_WND  16384
+#endif // MQTT_CERT_INC
+
+// This defaults to 4
+#define MQTT_REQ_MAX_IN_FLIGHT 5
+
+#endif
